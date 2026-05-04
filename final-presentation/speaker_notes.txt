@@ -1,0 +1,64 @@
+Rover Ready
+Final Presentation Speaker Notes
+
+Title Slide - Rover Ready
+
+Chirag:
+Hi, we are Chirag Baviskar and Dhrumil Patel, and our final project is Rover Ready.
+
+
+Slide 1 - Completed Project Overview
+
+Chirag:
+So our project is Rover Ready. It is a small WebXR repair scene where you are standing in one garage bay, getting a rover ready to leave. We kept the goal pretty direct: call the rover in, power it, fix what is broken, check it, and then send it out.
+
+
+Slide 2 - Demo Flow
+
+Dhrumil:
+For the demo, we are going to show the loop in the order the player would actually do it. First we press the call button, the bay opens, and the rover comes into position. Then we insert the power cell. After that, the next repair job shows the repair tool and the missing-part behavior, so you can see that the scene is more than just a static model.
+
+
+Slide 3 - Scene and Custom Assets
+
+Chirag:
+Visually, we went for a simple low-poly garage style. The shapes are chunky on purpose, because they read well in VR and we did not want the scene to turn into tiny mechanical detail. For the custom asset requirement, the power cell and repair tool are the main props, but we also made the rover and the bay. Each one is exported as its own GLB, which made it easier to load and control them separately in the demo.
+
+
+Slide 4 - Repair Bay Setup
+
+Chirag:
+This slide shows the main play space from inside the bay. The yellow outline marks where the rover stops, the screen and HUD show the current task, and the repair tools are kept near the work area instead of hidden somewhere else. The layout is meant to make the loop easy to read: check the objective, grab what you need, work on the rover, and then verify it.
+
+
+Slide 5 - Interaction 1: Power Module Insertion
+
+Dhrumil:
+The power cell interaction was the first big piece of the loop. When it is loose, it has physics and can be grabbed from the rack. Once the player gets it close enough to the receiver, we use the helper points from the model to snap it into the dock. That way the player still has to move it into the right area, but they do not have to line it up perfectly by hand.
+
+
+Slide 6 - Interaction 2: Repair and Replacement
+
+Chirag:
+The second main interaction is the repair step. The tool is not just decoration; when the player holds it, damaged parts can glow red, and holding the tool on the target long enough marks that part as fixed. Some levels also take parts off the rover completely, like a wheel or light, and put them on the rack as loose objects. Then the player has to place that part back on the rover.
+
+
+Slide 7 - Requirement Fit
+
+Dhrumil:
+This is the checklist version of how the final build matches the assignment. The original theme is the repair bay, the custom models are loaded with GLTFLoader, and the main interactions are powering and repairing the rover. For the advanced features, we used Cannon-ES physics, and we also have different object types with different behavior: buttons, tools, power cells, repair targets, and missing parts.
+
+
+Slide 8 - Individual Contributions
+
+Chirag:
+On my side, I focused more on the assets and final organization. That included keeping the low-poly style consistent, cleaning up the source and exported assets, and making sure the asset documentation and packaging matched what we actually built.
+
+Dhrumil:
+On my side, I focused more on the runtime. That meant getting the assets into Three.js, handling the controller and desktop interactions, setting up physics, and building the rover states for calling, powering, repairing, checking, and sending it out.
+
+
+Slide 9 - Reflection and Future Work
+
+Dhrumil:
+The hardest part was getting Blender and the browser runtime to agree with each other. A model can look fine in Blender, but then the snap point, collision box, or interaction distance can still feel wrong in WebXR. With more time, we would add stronger feedback, more repair variety, and more headset testing. For this version, though, the main repair loop is in place and stays focused.

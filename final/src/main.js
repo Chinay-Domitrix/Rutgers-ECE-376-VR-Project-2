@@ -57,7 +57,7 @@ const state = {
   roverInteractionsReady: false,
   repairAimTargetId: null,
   repairAimTimer: 0,
-  repairDwellTime: 3.0,
+  repairDwellTime: 3,
   repairTipReachDistance: 0.125,
   repairGlowTime: 0,
   partSnapCheckTimer: 0,
@@ -79,13 +79,13 @@ playerRig.name = "playerRig";
 playerRig.position.set(0, 0, 2.15);
 scene.add(playerRig);
 
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+const camera = new THREE.PerspectiveCamera(70, globalThis.innerWidth / globalThis.innerHeight, 0.1, 100);
 camera.position.set(0, 1.6, 0);
 playerRig.add(camera);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio, 2));
+renderer.setSize(globalThis.innerWidth, globalThis.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.xr.enabled = true;
@@ -198,9 +198,9 @@ updateObjective("Press the call button to bring in the first rover.");
 updateHud();
 
 renderer.setAnimationLoop(render);
-window.addEventListener("resize", onResize);
-window.addEventListener("keydown", (event) => setKey(event.code, true));
-window.addEventListener("keyup", (event) => setKey(event.code, false));
+globalThis.addEventListener("resize", onResize);
+globalThis.addEventListener("keydown", (event) => setKey(event.code, true));
+globalThis.addEventListener("keyup", (event) => setKey(event.code, false));
 renderer.domElement.addEventListener("pointerdown", onPointerDown);
 renderer.domElement.addEventListener("pointermove", onPointerMove);
 renderer.domElement.addEventListener("pointerup", onPointerUp);
@@ -722,7 +722,7 @@ function tryRayGrab(controller) {
   if (!hit) return false;
 
   const object = getGrabbableRoot(hit.object);
-  if (!object || !object.userData.grabbable || object.userData.locked) return false;
+  if (!object?.userData.grabbable || object?.userData.locked) return false;
 
   const body = physics.bodies.get(object);
   if (body) {
@@ -888,7 +888,7 @@ function onPointerDown(event) {
   if (!hit) return;
 
   mouseHeld = getGrabbableRoot(hit.object);
-  if (!mouseHeld || !mouseHeld.userData.grabbable || mouseHeld.userData.locked) {
+  if (!mouseHeld?.userData.grabbable || mouseHeld?.userData.locked) {
     mouseHeld = null;
     return;
   }
@@ -1102,26 +1102,10 @@ function clearLevelInteractionObjects() {
     removeLooseMissingPart(part);
     part.snapMarker?.parent?.remove(part.snapMarker);
 
-    if (part.sourceMeshes && part.sourceMeshes.length > 0) {
-      for (const mesh of part.sourceMeshes) setObjectVisible(mesh, true);
-    } else if (part.sourceRoot) {
-      setObjectVisible(part.sourceRoot, true);
-    }
-
-    if (part.sourceRoot && part.sourceRoot.name.includes("_VirtualRoot")) {
-      part.sourceRoot.parent?.remove(part.sourceRoot);
-    }
-    if (part.snapTarget && part.snapTarget.name.includes("_VirtualSnapTarget")) {
-      part.snapTarget.parent?.remove(part.snapTarget);
-    }
-    if (part.wheelId) {
-      const wheelPivot = rover?.wheels?.find((wheel) => wheel.userData.wheelId === part.wheelId);
-      if (wheelPivot) wheelPivot.userData.spinEnabled = true;
-    }
-
-    part.sourceRoot = null;
-    part.sourceMeshes = null;
-    part.snapTarget = null;
+    restoreMissingPartVisuals(part);
+    removeVirtualMissingPartHelpers(part);
+    reenableMissingPartWheelSpin(part);
+    clearMissingPartReferences(part);
   }
 
   for (const target of state.repairTargets) {
@@ -1130,6 +1114,37 @@ function clearLevelInteractionObjects() {
 
   state.missingParts = [];
   state.repairTargets = [];
+}
+
+function restoreMissingPartVisuals(part) {
+  if (part.sourceMeshes?.length > 0) {
+    for (const mesh of part.sourceMeshes) setObjectVisible(mesh, true);
+    return;
+  }
+
+  if (part.sourceRoot) setObjectVisible(part.sourceRoot, true);
+}
+
+function removeVirtualMissingPartHelpers(part) {
+  if (part.sourceRoot?.name.includes("_VirtualRoot")) {
+    part.sourceRoot.parent?.remove(part.sourceRoot);
+  }
+  if (part.snapTarget?.name.includes("_VirtualSnapTarget")) {
+    part.snapTarget.parent?.remove(part.snapTarget);
+  }
+}
+
+function reenableMissingPartWheelSpin(part) {
+  if (!part.wheelId) return;
+
+  const wheelPivot = rover?.wheels?.find((wheel) => wheel.userData.wheelId === part.wheelId);
+  if (wheelPivot) wheelPivot.userData.spinEnabled = true;
+}
+
+function clearMissingPartReferences(part) {
+  part.sourceRoot = null;
+  part.sourceMeshes = null;
+  part.snapTarget = null;
 }
 
 function removeLooseMissingPart(part) {
@@ -1243,7 +1258,7 @@ function setupLevelRoverInteractions(model) {
         return part;
       }
 
-      if (sourceMeshes && sourceMeshes.length > 0) {
+      if (sourceMeshes?.length > 0) {
         for (const mesh of sourceMeshes) setObjectVisible(mesh, false);
       } else {
         setObjectVisible(sourceRoot, false);
@@ -1299,7 +1314,7 @@ function setupLevelRoverInteractions(model) {
 }
 
 function spawnLooseMissingPart(part) {
-  if (!part.sourceRoot && (!part.sourceMeshes || part.sourceMeshes.length === 0)) return;
+  if (!part.sourceRoot && !part.sourceMeshes?.length) return;
 
   const group = new THREE.Group();
   group.name = `missingPart_${part.id}`;
@@ -1316,7 +1331,7 @@ function spawnLooseMissingPart(part) {
   const clone = new THREE.Group();
   clone.name = `${part.id}_looseVisual`;
 
-  if (part.sourceMeshes && part.sourceMeshes.length > 0) {
+  if (part.sourceMeshes?.length > 0) {
     for (const mesh of part.sourceMeshes) {
       const meshClone = mesh.clone(true);
       part.sourceRoot.updateMatrixWorld(true);
@@ -1540,14 +1555,15 @@ function isMissingPartInstalled(partId) {
 }
 
 function isRepairTargetActive(target) {
-  if (!target || target.meshes.length === 0) return false;
+  if (!target?.meshes.length) return false;
   if (target.missingPartId && !isMissingPartInstalled(target.missingPartId)) return false;
   return target.meshes.some((mesh) => mesh.visible !== false);
 }
 
 function getHeldRepairToolController() {
   const tool = getRepairTool();
-  if (!tool || tool.userData.locked) return null;
+  const toolData = tool?.userData;
+  if (!toolData || toolData.locked) return null;
 
   for (const [controller, heldObject] of state.held) {
     if (heldObject === tool) return controller;
@@ -1583,39 +1599,59 @@ function updateRepairInteractions(delta) {
 
   const scanToolHeld = isRepairToolCurrentlyHeld();
   const hitTarget = scanToolHeld ? getRepairTipTouchTarget() : null;
+  updateRepairAimTimer(hitTarget, delta);
 
-  if (hitTarget && hitTarget.id === state.repairAimTargetId) {
+  const activeRepairProgress = getActiveRepairProgress(hitTarget);
+  completeRepairIfReady(hitTarget, activeRepairProgress);
+  updateRepairTargetGlows(hitTarget, scanToolHeld, activeRepairProgress);
+}
+
+function updateRepairAimTimer(hitTarget, delta) {
+  if (hitTarget?.id === state.repairAimTargetId) {
     state.repairAimTimer += delta;
-  } else {
-    state.repairAimTargetId = hitTarget?.id ?? null;
-    state.repairAimTimer = hitTarget ? delta : 0;
+    return;
   }
 
-  const activeRepairProgress = hitTarget
-    ? THREE.MathUtils.clamp(state.repairAimTimer / state.repairDwellTime, 0, 1)
-    : 0;
+  state.repairAimTargetId = hitTarget?.id ?? null;
+  state.repairAimTimer = hitTarget ? delta : 0;
+}
 
-  if (hitTarget && activeRepairProgress >= 1) {
-    repairTarget(hitTarget);
-    state.repairAimTargetId = null;
-    state.repairAimTimer = 0;
-  }
+function getActiveRepairProgress(hitTarget) {
+  return hitTarget ? THREE.MathUtils.clamp(state.repairAimTimer / state.repairDwellTime, 0, 1) : 0;
+}
 
+function completeRepairIfReady(hitTarget, activeRepairProgress) {
+  if (!hitTarget || activeRepairProgress < 1) return;
+
+  repairTarget(hitTarget);
+  state.repairAimTargetId = null;
+  state.repairAimTimer = 0;
+}
+
+function updateRepairTargetGlows(hitTarget, scanToolHeld, activeRepairProgress) {
   const pulse = (Math.sin(state.repairGlowTime * 5.5) + 1) / 2;
   for (const target of state.repairTargets) {
-    if (!isRepairTargetActive(target)) {
-      setRepairTargetGlow(target, "off");
-    } else if (target.repaired) {
-      // Repaired target display state.
-      setRepairTargetGlow(target, state.roverGoodForLevel ? "off" : "fixed");
-    } else if (target === hitTarget) {
-      setRepairTargetGlow(target, "repairing", pulse, activeRepairProgress);
-    } else if (scanToolHeld) {
-      setRepairTargetGlow(target, "damaged", pulse);
-    } else {
-      setRepairTargetGlow(target, "off");
-    }
+    updateRepairTargetGlow(target, hitTarget, scanToolHeld, pulse, activeRepairProgress);
   }
+}
+
+function updateRepairTargetGlow(target, hitTarget, scanToolHeld, pulse, activeRepairProgress) {
+  if (!isRepairTargetActive(target)) {
+    setRepairTargetGlow(target, "off");
+    return;
+  }
+
+  if (target.repaired) {
+    setRepairTargetGlow(target, state.roverGoodForLevel ? "off" : "fixed");
+    return;
+  }
+
+  if (target === hitTarget) {
+    setRepairTargetGlow(target, "repairing", pulse, activeRepairProgress);
+    return;
+  }
+
+  setRepairTargetGlow(target, scanToolHeld ? "damaged" : "off", pulse);
 }
 
 function getRepairTipTouchTarget() {
@@ -1714,7 +1750,7 @@ function updateMissingPartSnapThrottled(delta) {
 function updateMissingPartSnapMarkers(heldPartObject) {
   for (const part of state.missingParts) {
     if (!part.snapMarker) continue;
-    const isHeldMatch = heldPartObject && part.looseObject === heldPartObject && !part.installed;
+    const isHeldMatch = Boolean(heldPartObject) && part.looseObject === heldPartObject && !part.installed;
     const distance = isHeldMatch
       ? heldPartObject
           .getWorldPosition(new THREE.Vector3())
@@ -1758,7 +1794,7 @@ function snapMissingPartToRover(part) {
   part.snapMarker?.parent?.remove(part.snapMarker);
   part.snapMarker = null;
 
-  if (part.sourceMeshes && part.sourceMeshes.length > 0) {
+  if (part.sourceMeshes?.length > 0) {
     for (const mesh of part.sourceMeshes) setObjectVisible(mesh, true);
   } else if (part.sourceRoot) {
     setObjectVisible(part.sourceRoot, true);
@@ -1870,7 +1906,7 @@ function stageRoverForArrival() {
   rover.group.rotation.y = -Math.PI / 2;
   rover.group.userData.arrivalTargetZ = ROVER_PARKED_Z;
   rover.group.userData.parkedRotationY = 0;
-  rover.group.userData.exitRotationY = -Math.PI / 2;
+  rover.group.userData.exitRotationY = Math.PI / 2;
   rover.group.userData.exitTargetZ = ROVER_ENTRY_Z;
   resetPowerCellInstallStateForLevel();
   state.powerSnapCheckTimer = 0;
@@ -2042,7 +2078,7 @@ function updateRoverLeavingTurn(delta) {
 
   const targetRotation = rover.group.userData.exitRotationY ?? -Math.PI / 2;
   rover.group.rotation.y = THREE.MathUtils.damp(rover.group.rotation.y, targetRotation, 4.5, delta);
-  spinRoverWheels(-delta * 2.5);
+  spinRoverWheels(delta * 2.5);
   markShadowsDirty();
 
   if (Math.abs(rover.group.rotation.y - targetRotation) > 0.015) return;
@@ -2057,8 +2093,8 @@ function updateRoverLeaving(delta) {
   if (!state.roverLeaving || !rover) return;
 
   const exitTargetZ = rover.group.userData.exitTargetZ ?? ROVER_ENTRY_Z;
-  rover.group.position.z -= delta * 1.2;
-  spinRoverWheels(-delta * 8.5);
+  rover.group.position.z -= delta * 2.5;
+  spinRoverWheels(delta * 8.5);
   markShadowsDirty();
 
   if (rover.group.position.z > exitTargetZ) return;
@@ -2326,7 +2362,7 @@ function updateLocomotion(delta) {
 
   if (move.lengthSq() === 0) return;
 
-  const speed = renderer.xr.isPresenting ? 4 : 3.0;
+  const speed = renderer.xr.isPresenting ? 4 : 3;
   const yaw = getCameraYaw();
   const forward = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
   const right = new THREE.Vector3(-forward.z, 0, forward.x);
@@ -2820,7 +2856,7 @@ function getMeshWorldCenter(mesh) {
 }
 
 function setMeshIndicatorBlue(mesh) {
-  if (!mesh?.isMesh || mesh.userData.powerReadyBlue) return;
+  if (!mesh?.isMesh || mesh?.userData.powerReadyBlue) return;
   if (meshLooksBlue(mesh)) return;
 
   mesh.material = Array.isArray(mesh.material)
@@ -2972,9 +3008,9 @@ function render() {
 }
 
 function onResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = globalThis.innerWidth / globalThis.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(globalThis.innerWidth, globalThis.innerHeight);
 }
 
 function toCannonVec(vector) {

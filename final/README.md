@@ -104,8 +104,8 @@ instead of expanding into a separate game mode.
 ## Submitted Materials
 
 The source tree includes the runnable WebXR demo, original Blender files,
-exported GLB models, and Blender generation scripts. The packaged asset/source
-bundle is `./dist/rover_ready_assets.zip`.
+exported GLB models, and Blender generation scripts. The recorded demo video is
+hosted separately and is not needed to run the source submission.
 
 For implementation layout, asset inventory, rebuild commands, package contents,
 and library details, see `./technical-details.md`.

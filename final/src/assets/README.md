@@ -46,7 +46,7 @@ The garage bay base script is `./scripts/blender/create_rover_bay.py`. The bay c
 
 The `.blend` files are the source asset files. The `.glb` files are the runtime assets to load with Three.js `GLTFLoader`.
 
-The distributable package is `./dist/rover_ready_assets.zip`. It contains this README, the Blender source scripts from `./scripts/blender`, the runtime `.glb` files, and the source `.blend` files. Local Python cache folders are intentionally left out of the zip.
+The source submission should include this README, the Blender source scripts from `./scripts/blender`, the runtime `.glb` files, and the source `.blend` files. Local Python cache folders are intentionally left out of the zip.
 
 ## Asset Overview
 

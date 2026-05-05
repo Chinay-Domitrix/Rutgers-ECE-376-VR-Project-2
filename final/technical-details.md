@@ -12,8 +12,6 @@ and packaging notes for the Rover Ready final deliverable.
 - `./src/assets/models/`: exported runtime GLB models loaded by the demo.
 - `./src/assets/blend/`: original Blender source files preserved for submission.
 - `./scripts/blender/`: Blender Python scripts used to generate and update the models.
-- `./dist/rover_ready_assets.zip`: packaged asset/source bundle.
-- `./pyproject.toml` and `./uv.lock`: Python tooling metadata for Blender-related scripts.
 
 Generated local folders such as `./.venv`, `./.ruff_cache`, and `./__pycache__`
 are intentionally not part of the submitted tree.
@@ -61,11 +59,9 @@ The other Blender scripts are:
 ./scripts/blender/create_mars_exterior_addon.py
 ```
 
-## Asset Package
+## Demo Video
 
-The asset package at `./dist/rover_ready_assets.zip` contains the README files,
-Blender scripts, runtime GLB models, and source Blender files. Local cache files
-and Blender backup `.blend1` files are intentionally excluded.
+The recorded final demo video is hosted separately from the source submission.
 
 ## External Libraries
 

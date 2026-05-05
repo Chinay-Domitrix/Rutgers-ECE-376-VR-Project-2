@@ -99,7 +99,9 @@ Current important paths:
 - `final/src/assets/README.md`: asset contract, generation notes, node names,
   and GLTF integration assumptions.
 - `final/scripts/blender/`: Blender Python asset-generation scripts.
-- `final/docs/demo.md`: concise demo/run notes.
+- `final/technical-details.md`: implementation layout, asset inventory, and
+  rebuild notes.
+- `final/Ready_Rover_demo.mp4`: recorded final demo video.
 - `final/dist/`: distributable packaged assets.
 - `final/run-demo.ps1`, `final/run-demo.bat`, `final/run-demo.sh`: quick-run
   scripts.
@@ -226,7 +228,8 @@ Use documents deliberately:
 - `project2.md`: assignment brief and grading source.
 - `AGENTS.md`: repo operating contract.
 - `final/README.md`: final demo run instructions and structure.
-- `final/docs/demo.md`: concise demo instructions.
+- `final/technical-details.md`: implementation layout, asset inventory, rebuild
+  commands, and packaging notes.
 - `final/src/assets/README.md`: asset generation and GLTF node contract.
 - `final-presentation/`: final presentation deck, draft, notes, and image
   generation scripts.
@@ -290,6 +293,7 @@ Before treating the final project as ready, make sure:
 - The demo code is in `final/src/`.
 - Blender scripts are in `final/scripts/blender/`.
 - Runtime models and source blends are in `final/src/assets/`.
+- The recorded demo video is `final/Ready_Rover_demo.mp4`.
 - Final presentation materials exist in `final-presentation/`.
 - Final report materials exist in `final-report/`.
 - The active milestone is final submission packaging and polish for May 4.
